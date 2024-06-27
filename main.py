@@ -1,19 +1,24 @@
-from bs4 import BeautifulSoup
-import requests
+from newspaper import Article
+from newspaper import Config
+import nltk
+nltk.download('punkt')
 
 
-url = 'https://timesofindia.indiatimes.com/'
+def scrape_article(url):
+    article = Article(url)
+    article.download()
+    article.parse()
+    article.nlp()  # Perform NLP tasks like keyword extraction and summary generation
+    return {
+        'title': article.title,
+        'authors': article.authors,
+        'publication_date': article.publish_date,
+        'summary': article.summary,
+        'keywords': article.keywords,
+        'text': article.text
+    }
 
-# Send a GET request to the URL
-response = requests.get(url)
-
-# Check if the request was successful (status code 200)
-if response.status_code == 200:
-    # Parse the HTML content of the page
-    soup = BeautifulSoup(response.text, 'html.parser')
-
-    # Find a common parent or container element
-    containers = soup.find_all('div')  # Adjust 'div' to the actual parent/container element
-    print(containers)
-else:
-    print(f'Failed to retrieve the webpage. Status code: {response.status_code}')
+# Example usage
+url = 'https://www.thehindu.com/news/'
+article_data = scrape_article(url)
+print(article_data)
